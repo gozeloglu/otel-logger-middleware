@@ -11,7 +11,7 @@ type namingConverter interface {
 	convert(span trace.Span, record *slog.Record)
 }
 
-type OtelLoggerMiddleware struct {
+type otelLoggerMiddleware struct {
 	slog.Handler
 	converter namingConverter
 }
@@ -33,13 +33,13 @@ const (
 )
 
 func NewOtelLoggerMiddleware(baseHandler slog.Handler, converter namingConverter) slog.Handler {
-	return &OtelLoggerMiddleware{
+	return &otelLoggerMiddleware{
 		Handler:   baseHandler,
 		converter: converter,
 	}
 }
 
-func (o *OtelLoggerMiddleware) Handle(ctx context.Context, record slog.Record) error {
+func (o *otelLoggerMiddleware) Handle(ctx context.Context, record slog.Record) error {
 	span := trace.SpanFromContext(ctx)
 	if span.SpanContext().IsValid() && span.SpanContext().HasSpanID() && span.SpanContext().HasTraceID() {
 		o.converter.convert(span, &record)
